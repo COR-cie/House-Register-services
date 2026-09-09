@@ -1,0 +1,8 @@
+# Secrets & données locales — ne jamais versionner
+.env
+certs/
+sauvegardes/
+*.pem
+*.key
+*.dump
+*.sql.gz

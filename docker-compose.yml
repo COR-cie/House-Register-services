@@ -1,0 +1,56 @@
+# Registre Foncier — déploiement (images préconstruites)
+#
+#   docker compose up -d
+#
+# Ce fichier ne contient AUCUN code source : il déploie les images officielles
+# publiées par CORAF & Cie sur GitHub Container Registry (ghcr.io). Pour mettre à
+# jour vers la dernière version : ./scripts/mettre-a-jour.sh
+name: registre-foncier
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-registre}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir POSTGRES_PASSWORD dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:-registre_foncier}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-registre} -d ${POSTGRES_DB:-registre_foncier}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    image: ghcr.io/cor-cie/house-register-backend:${IMAGE_TAG:-latest}
+    restart: always
+    # Applique les migrations et crée l'administrateur initial au démarrage.
+    env_file: .env
+    environment:
+      ENV: production
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      MEDIA_ROOT: /data/pieces
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media:/data/pieces
+
+  web:
+    image: ghcr.io/cor-cie/house-register-web:${IMAGE_TAG:-latest}
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Certificats TLS fournis par l'exploitant (voir scripts/generer-certs.sh).
+      - ./certs:/etc/nginx/certs:ro
+
+volumes:
+  pgdata: # base de données (métadonnées)
+  media: # pièces jointes chiffrées
