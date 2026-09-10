@@ -8,6 +8,9 @@ jour à chaque nouvelle version.
 > Édité par **CORAF & Cie**. Le code source est privé ; l'assistance et les nouvelles
 > versions sont fournies par l'éditeur.
 
+> 📘 **Déploiement complet (données privées, du début à la fin) :** voir
+> [GUIDE-DEPLOIEMENT.md](GUIDE-DEPLOIEMENT.md). Ce README en est la version express.
+
 ---
 
 ## 1. Ce que fait ce kit
