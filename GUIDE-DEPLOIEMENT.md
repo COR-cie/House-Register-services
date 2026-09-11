@@ -15,7 +15,7 @@ Registre Foncier se déploie **sur les serveurs de l'organisation**. Aucune donn
 - **Souveraineté** — la base et les pièces justificatives restent sur votre infrastructure.
 - **Chiffrement au repos** des pièces jointes ; la clé (`SECRET_KEY`) est **détenue par vous seul**.
 - **Accès par rôle** (agent / superviseur / administrateur) et **journal d'audit** inaltérable.
-- **Sans code source** — ce déploiement tire les **images officielles** publiées par CORAF & Cie et se met à jour à chaque nouvelle version.
+- **Sans code source** — ce déploiement tire les **images officielles** publiées par COR & Cie et se met à jour à chaque nouvelle version.
 
 > ⚠️ **Règle d'or.** Générez `SECRET_KEY` une seule fois et conservez-la en lieu sûr. Sans elle, les pièces déjà chiffrées deviennent **illisibles**. Ne la modifiez **jamais** après la première mise en service.
 
@@ -29,7 +29,7 @@ Registre Foncier se déploie **sur les serveurs de l'organisation**. Aucune donn
 | **Logiciels** | **Docker Engine** + plugin **Docker Compose v2**. |
 | **Réseau** | Ports **80** et **443** libres ; un nom (DNS interne, ex. `registre.mon-organisation.cg`). |
 | **TLS** | Un certificat (PKI de l'organisation ou autorité de confiance). Auto-signé accepté pour un test. |
-| **Accès images** | Un jeton de lecture GHCR fourni par CORAF & Cie (si les images sont privées). |
+| **Accès images** | Un jeton de lecture GHCR fourni par COR & Cie (si les images sont privées). |
 
 ---
 
@@ -154,7 +154,7 @@ Dans l'interface (menu **Administration**), aucune ligne de commande :
 Deux voies selon le volume :
 
 - **Saisie assistée** — les agents enregistrent les dossiers papier via la plateforme (numérisation des pièces incluse).
-- **Reprise encadrée** — pour un gros volume, CORAF & Cie accompagne une reprise structurée au périmètre convenu.
+- **Reprise encadrée** — pour un gros volume, COR & Cie accompagne une reprise structurée au périmètre convenu.
 
 > ⚠️ **Données personnelles.** N'importez que les données nécessaires, sur le réseau interne, avec les accès restreints.
 
@@ -248,7 +248,7 @@ Choisissez la ligne d'images via `IMAGE_TAG` dans `.env` : `latest` (stable) ou 
 
 ## Annexe A — Côté éditeur : publier et distribuer des images privées
 
-Cette annexe s'adresse à **vous, l'éditeur** (CORAF & Cie), pas au client. Elle explique où sont publiées les images et comment donner à **chaque organisation** un accès en lecture — sans jamais partager votre compte ni votre code source.
+Cette annexe s'adresse à **vous, l'éditeur** (COR & Cie), pas au client. Elle explique où sont publiées les images et comment donner à **chaque organisation** un accès en lecture — sans jamais partager votre compte ni votre code source.
 
 ### A.1 Où vivent les images ?
 
@@ -274,7 +274,7 @@ GitHub → organisation **COR-cie** → onglet **Packages** → `house-register-
 
 Objectif : donner à chaque organisation cliente un **jeton de lecture qui lui est propre**, révocable indépendamment.
 
-**1) Un compte de distribution dédié (une seule fois).** Créez un compte GitHub de service, p. ex. `coraf-livraison`, et donnez-lui un accès **en lecture seule à ces deux packages uniquement** : chaque package → **Manage access** → **Invite teams or people** → rôle **Read**. Ce compte ne peut que **tirer** ces deux images — rien d'autre. C'est lui, le `-u <utilisateur>` de la commande de connexion.
+**1) Un compte de distribution dédié (une seule fois).** Créez un compte GitHub de service, p. ex. `COR-and-CIE-livraison`, et donnez-lui un accès **en lecture seule à ces deux packages uniquement** : chaque package → **Manage access** → **Invite teams or people** → rôle **Read**. Ce compte ne peut que **tirer** ces deux images — rien d'autre. C'est lui, le `-u <utilisateur>` de la commande de connexion.
 
 **2) Un jeton par client.** Connecté sur ce compte de service : **Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token**. Cochez **uniquement** la portée `read:packages`. Nommez-le au nom du client (p. ex. `client-mairie-pointe-noire`) et fixez une **expiration** (p. ex. 12 mois). Générez, puis **copiez le jeton** (il n'est affiché qu'une fois).
 
@@ -282,7 +282,7 @@ Objectif : donner à chaque organisation cliente un **jeton de lecture qui lui e
 
 **4) Le client se connecte** une seule fois, sur son serveur, avant l'installation :
 ```bash
-echo <JETON_DU_CLIENT> | docker login ghcr.io -u coraf-livraison --password-stdin
+echo <JETON_DU_CLIENT> | docker login ghcr.io -u COR-and-CIE-livraison --password-stdin
 ```
 Ensuite `sh scripts/installer.sh` tire les images normalement.
 
@@ -310,7 +310,7 @@ Déroulé type pour mettre une nouvelle organisation en service, du premier cont
 
 ### Phase 2 — Remise (éditeur → client)
 
-- [ ] Transmettre le **jeton** + l'identifiant du compte de service (`coraf-livraison`) par un canal sûr.
+- [ ] Transmettre le **jeton** + l'identifiant du compte de service (`COR-and-CIE-livraison`) par un canal sûr.
 - [ ] Indiquer le dépôt du kit : `git clone https://github.com/COR-cie/House-Register-services.git`.
 - [ ] Fournir ce guide (sections 1 à 8).
 - [ ] Rappeler : la **`SECRET_KEY` est générée par le client** et n'est **jamais** partagée avec vous.
@@ -318,7 +318,7 @@ Déroulé type pour mettre une nouvelle organisation en service, du premier cont
 ### Phase 3 — Installation (client, accompagné)
 
 - [ ] Serveur prêt : Docker + Compose v2, ports 80/443, pare-feu (§ 1–2).
-- [ ] `docker login ghcr.io -u coraf-livraison` avec le jeton (§ 3).
+- [ ] `docker login ghcr.io -u COR-and-CIE-livraison` avec le jeton (§ 3).
 - [ ] `.env` renseigné : `SECRET_KEY` (générée **et archivée**), mots de passe, `CORS_ORIGINS` (§ 4).
 - [ ] Certificat TLS de confiance dans `certs/` (§ 5).
 - [ ] `sh scripts/installer.sh` (§ 6).
@@ -344,4 +344,4 @@ Déroulé type pour mettre une nouvelle organisation en service, du premier cont
 
 ---
 
-**Édité par CORAF & Cie — Registre Foncier.** Le code source est privé ; l'assistance et les nouvelles versions sont fournies par l'éditeur.
+**Édité par COR & Cie — Registre Foncier.** Le code source est privé ; l'assistance et les nouvelles versions sont fournies par l'éditeur.

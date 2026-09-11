@@ -3,7 +3,7 @@
 #   docker compose up -d
 #
 # Ce fichier ne contient AUCUN code source : il déploie les images officielles
-# publiées par CORAF & Cie sur GitHub Container Registry (ghcr.io). Pour mettre à
+# publiées par COR & Cie sur GitHub Container Registry (ghcr.io). Pour mettre à
 # jour vers la dernière version : ./scripts/mettre-a-jour.sh
 name: registre-foncier
 

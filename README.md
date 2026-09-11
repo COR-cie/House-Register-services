@@ -2,10 +2,10 @@
 
 Kit de **déploiement** de la plateforme **Registre Foncier** (République du Congo),
 destiné aux organisations qui l'exploitent. Ce dépôt **ne contient pas le code
-source** : il déploie les **images officielles** publiées par CORAF & Cie et se met à
+source** : il déploie les **images officielles** publiées par COR & Cie et se met à
 jour à chaque nouvelle version.
 
-> Édité par **CORAF & Cie**. Le code source est privé ; l'assistance et les nouvelles
+> Édité par **COR & Cie**. Le code source est privé ; l'assistance et les nouvelles
 > versions sont fournies par l'éditeur.
 
 > 📘 **Déploiement complet (données privées, du début à la fin) :** voir
@@ -39,13 +39,13 @@ Les images sont hébergées sur **GitHub Container Registry** :
 - `ghcr.io/cor-cie/house-register-web`
 
 Si les images sont **privées**, connectez Docker une fois avec un jeton fourni par
-CORAF & Cie (droit `read:packages`) :
+COR & Cie (droit `read:packages`) :
 
 ```bash
 echo <VOTRE_JETON> | docker login ghcr.io -u <votre-utilisateur> --password-stdin
 ```
 
-*(Si CORAF & Cie a rendu les images publiques, cette étape est inutile.)*
+*(Si COR & Cie a rendu les images publiques, cette étape est inutile.)*
 
 ## 4. Installation
 
@@ -138,4 +138,4 @@ Les données persistent dans les volumes Docker `pgdata` (base) et `media` (piè
 
 ---
 
-**Support :** CORAF & Cie — Registre Foncier.
+**Support :** COR & Cie — Registre Foncier.
