@@ -246,4 +246,56 @@ Choisissez la ligne d'images via `IMAGE_TAG` dans `.env` : `latest` (stable) ou 
 
 ---
 
+## Annexe A — Côté éditeur : publier et distribuer des images privées
+
+Cette annexe s'adresse à **vous, l'éditeur** (CORAF & Cie), pas au client. Elle explique où sont publiées les images et comment donner à **chaque organisation** un accès en lecture — sans jamais partager votre compte ni votre code source.
+
+### A.1 Où vivent les images ?
+
+Vous n'hébergez **aucun serveur de registre**. Les images sont stockées sur **GitHub Container Registry (GHCR)**, le registre d'images de GitHub, sous l'organisation `COR-cie` :
+
+- `ghcr.io/cor-cie/house-register-backend`
+- `ghcr.io/cor-cie/house-register-web`
+
+La **publication est automatique** : le workflow GitHub Actions `.github/workflows/publish-images.yml` (re)construit et pousse les images à chaque `push` sur `main` (→ tag `latest`) et `stage` (→ tag `stage`). Rien d'autre à administrer.
+
+> Publication manuelle depuis une machine de build, au besoin — le jeton doit avoir la portée `write:packages` :
+> ```bash
+> echo <PAT_write> | docker login ghcr.io -u <votre-utilisateur> --password-stdin
+> docker build -t ghcr.io/cor-cie/house-register-backend:latest ./backend
+> docker push ghcr.io/cor-cie/house-register-backend:latest
+> ```
+
+### A.2 Rendre les images privées
+
+GitHub → organisation **COR-cie** → onglet **Packages** → `house-register-backend` → **Package settings** → **Danger Zone** → **Change visibility** → **Private**. Répétez pour `house-register-web`. Une image privée ne peut être tirée qu'avec un jeton autorisé.
+
+### A.3 Créer un accès en lecture par organisation (le point clé)
+
+Objectif : donner à chaque organisation cliente un **jeton de lecture qui lui est propre**, révocable indépendamment.
+
+**1) Un compte de distribution dédié (une seule fois).** Créez un compte GitHub de service, p. ex. `coraf-livraison`, et donnez-lui un accès **en lecture seule à ces deux packages uniquement** : chaque package → **Manage access** → **Invite teams or people** → rôle **Read**. Ce compte ne peut que **tirer** ces deux images — rien d'autre. C'est lui, le `-u <utilisateur>` de la commande de connexion.
+
+**2) Un jeton par client.** Connecté sur ce compte de service : **Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token**. Cochez **uniquement** la portée `read:packages`. Nommez-le au nom du client (p. ex. `client-mairie-pointe-noire`) et fixez une **expiration** (p. ex. 12 mois). Générez, puis **copiez le jeton** (il n'est affiché qu'une fois).
+
+**3) Partagez ce jeton au client** par un canal sûr (idéalement un gestionnaire de mots de passe partagé — pas un e-mail en clair).
+
+**4) Le client se connecte** une seule fois, sur son serveur, avant l'installation :
+```bash
+echo <JETON_DU_CLIENT> | docker login ghcr.io -u coraf-livraison --password-stdin
+```
+Ensuite `sh scripts/installer.sh` tire les images normalement.
+
+**5) Révoquer un client** : Settings → Developer settings → Personal access tokens → supprimez **son** jeton. Seul ce client perd l'accès ; les autres continuent.
+
+> **Pourquoi un compte de service + un jeton par client ?**
+> - Un jeton `read:packages` classique donne accès en lecture à **tous** les packages que son compte peut voir. En le rattachant à un compte de service qui n'a accès **qu'à ces deux images**, une fuite éventuelle n'expose que ces images — jamais votre compte, ni votre code source (qui reste privé).
+> - Un jeton **par** client = révocation et rotation **indépendantes**, et vous savez qui détient quoi.
+
+**Variante moderne (fine-grained).** *Settings → Developer settings → Fine-grained tokens*, avec *Resource owner = COR-cie* et *Permissions → Packages : Read-only* : la portée est restreinte nativement. À utiliser si l'organisation autorise ces jetons.
+
+**Alternative sans jeton.** Si vous acceptez que n'importe qui puisse *tirer* les binaires (le code source, lui, reste privé), passez les images en **Public** (A.2, visibility **Public**) : plus aucun `docker login` n'est nécessaire côté client. À réserver aux cas où la confidentialité des binaires n'est pas exigée.
+
+---
+
 **Édité par CORAF & Cie — Registre Foncier.** Le code source est privé ; l'assistance et les nouvelles versions sont fournies par l'éditeur.
