@@ -298,4 +298,50 @@ Ensuite `sh scripts/installer.sh` tire les images normalement.
 
 ---
 
+## Annexe B — Procédure d'onboarding d'une organisation
+
+Déroulé type pour mettre une nouvelle organisation en service, du premier contact à l'exploitation. Les étapes techniques renvoient aux sections ci-dessus.
+
+### Phase 1 — Préparation (éditeur, avant la remise)
+
+- [ ] Cadrer le périmètre : nombre d'utilisateurs, serveur sur site, nom de domaine interne, volume prévu.
+- [ ] Créer le **jeton de lecture** du client (Annexe A.3) : `client-<organisation>`, portée `read:packages`, avec expiration.
+- [ ] Consigner le client dans un **registre de livraison** (nom, jeton, date, expiration, `IMAGE_TAG` prévu).
+
+### Phase 2 — Remise (éditeur → client)
+
+- [ ] Transmettre le **jeton** + l'identifiant du compte de service (`coraf-livraison`) par un canal sûr.
+- [ ] Indiquer le dépôt du kit : `git clone https://github.com/COR-cie/House-Register-services.git`.
+- [ ] Fournir ce guide (sections 1 à 8).
+- [ ] Rappeler : la **`SECRET_KEY` est générée par le client** et n'est **jamais** partagée avec vous.
+
+### Phase 3 — Installation (client, accompagné)
+
+- [ ] Serveur prêt : Docker + Compose v2, ports 80/443, pare-feu (§ 1–2).
+- [ ] `docker login ghcr.io -u coraf-livraison` avec le jeton (§ 3).
+- [ ] `.env` renseigné : `SECRET_KEY` (générée **et archivée**), mots de passe, `CORS_ORIGINS` (§ 4).
+- [ ] Certificat TLS de confiance dans `certs/` (§ 5).
+- [ ] `sh scripts/installer.sh` (§ 6).
+
+### Phase 4 — Recette (éditeur + client)
+
+- [ ] `curl -k https://localhost/api/health` = ok ; les 3 services `Up`.
+- [ ] Connexion administrateur OK, **mot de passe initial changé**.
+- [ ] Test de bout en bout : créer un dossier → le valider → imprimer le récépissé → **scanner le QR** → page de vérification.
+- [ ] **Sauvegarde testée + restauration testée** + planification cron (§ 11).
+
+### Phase 5 — Mise en service & transfert
+
+- [ ] Créer les comptes réels (agents, superviseurs, administrateurs), zones, types de pièces, apparence (§ 8).
+- [ ] Transmettre la procédure de **mise à jour** (`scripts/mettre-a-jour.sh`, § 12) et les **contacts support / maintenance**.
+- [ ] Rappeler par écrit la **garde de la `SECRET_KEY`** (règle d'or).
+
+### Phase 6 — Suivi (éditeur)
+
+- [ ] Noter l'**expiration du jeton** et le renouveler avant l'échéance.
+- [ ] Tenir à jour le registre de livraison (version déployée, incidents).
+- [ ] En fin de contrat : **révoquer le jeton** du client (Annexe A.3, étape 5).
+
+---
+
 **Édité par CORAF & Cie — Registre Foncier.** Le code source est privé ; l'assistance et les nouvelles versions sont fournies par l'éditeur.
