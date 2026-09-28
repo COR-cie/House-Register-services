@@ -8,8 +8,10 @@ jour à chaque nouvelle version.
 > Édité par **COR & Cie**. Le code source est privé ; l'assistance et les nouvelles
 > versions sont fournies par l'éditeur.
 
-> 📘 **Déploiement complet (données privées, du début à la fin) :** voir
-> [GUIDE-DEPLOIEMENT.md](GUIDE-DEPLOIEMENT.md). Ce README en est la version express.
+> 📘 **Déploiement complet (données privées, du début à la fin) :** voir le
+> **guide de déploiement** dans le dépôt House-Register :
+> [docs/GUIDE-DEPLOIEMENT.md](https://github.com/COR-cie/House-Register/blob/main/docs/GUIDE-DEPLOIEMENT.md).
+> Ce README en est la version express.
 
 ---
 
